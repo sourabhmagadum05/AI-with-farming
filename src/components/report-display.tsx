@@ -21,7 +21,7 @@ export default function ReportDisplay({ report }: ReportDisplayProps) {
 
 
   return (
-    <div id="report-content" className="printable">
+    <>
       <div className="flex justify-between items-start mb-6 no-print">
         <h2 className="text-3xl font-bold font-headline">Analysis Report</h2>
         <Button onClick={handlePrint} variant="outline">
@@ -29,8 +29,7 @@ export default function ReportDisplay({ report }: ReportDisplayProps) {
           Download PDF
         </Button>
       </div>
-      
-      <div className="space-y-6">
+      <div id="report-content" className="space-y-6">
         <Card className="card-shadow overflow-hidden">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -87,6 +86,6 @@ export default function ReportDisplay({ report }: ReportDisplayProps) {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </>
   );
 }
