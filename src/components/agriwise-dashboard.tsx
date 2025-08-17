@@ -1,6 +1,6 @@
 'use client';
 
-import { useFormState } from 'react-dom';
+import { useActionState } from 'react';
 import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { getAnalysisAndRecommendation, type FormState } from '@/app/actions';
@@ -15,7 +15,7 @@ const initialState: FormState = {
 
 export default function AgriwiseDashboard() {
   const { toast } = useToast();
-  const [state, formAction] = useFormState(
+  const [state, formAction] = useActionState(
     getAnalysisAndRecommendation,
     initialState
   );
