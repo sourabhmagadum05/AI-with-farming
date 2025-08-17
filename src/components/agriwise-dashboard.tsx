@@ -32,14 +32,14 @@ export default function AgriwiseDashboard() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
-      <div className="lg:col-span-2">
+      <div className="lg:col-span-2 no-print">
         <AnalysisForm formAction={formAction} errors={state.errors} />
       </div>
       <div className="lg:col-span-3">
         {state.report ? (
           <ReportDisplay report={state.report} />
         ) : (
-          <Card>
+          <Card className="no-print">
             <CardContent className="p-6">
               <h2 className="text-2xl font-bold mb-4">Your Report</h2>
               <p className="text-muted-foreground mb-6">
