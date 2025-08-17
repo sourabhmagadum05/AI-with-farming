@@ -1,6 +1,7 @@
 'use client';
 
 import { useFormStatus } from 'react-dom';
+import { useState } from 'react';
 import {
   Card,
   CardContent,
@@ -14,7 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Loader2 } from 'lucide-react';
+import { Loader2, PlusCircle, Trash2 } from 'lucide-react';
 import { Separator } from './ui/separator';
 
 type AnalysisFormProps = {
@@ -39,6 +40,82 @@ function SubmitButton() {
     </Button>
   );
 }
+
+type DynamicField = {
+  id: number;
+  name: string;
+  value: string;
+};
+
+const DynamicFieldArray = ({ name, label, error }: { name: string, label: string, error?: string[] | undefined }) => {
+  const [fields, setFields] = useState<DynamicField[]>([{ id: 1, name: '', value: '' }]);
+
+  const addField = () => {
+    setFields([...fields, { id: Date.now(), name: '', value: '' }]);
+  };
+
+  const removeField = (id: number) => {
+    setFields(fields.filter(field => field.id !== id));
+  };
+
+  const handleNameChange = (id: number, value: string) => {
+    setFields(fields.map(field => field.id === id ? { ...field, name: value } : field));
+  };
+  
+  const handleValueChange = (id: number, value: string) => {
+     setFields(fields.map(field => field.id === id ? { ...field, value: value } : field));
+  };
+
+  return (
+    <div className="space-y-4">
+      <Label>{label}</Label>
+      <div className="space-y-2">
+        {fields.map((field, index) => (
+          <div key={field.id} className="flex items-center gap-2">
+            <Input 
+              name={`${name}_name_${index}`} 
+              placeholder="Name" 
+              defaultValue={field.name}
+              onChange={(e) => handleNameChange(field.id, e.target.value)}
+              aria-label={`${label} Name`}
+            />
+            <Input 
+              name={`${name}_value_${index}`} 
+              type="number" 
+              step="0.01" 
+              placeholder="Value (ppm)" 
+              defaultValue={field.value}
+              onChange={(e) => handleValueChange(field.id, e.target.value)}
+              aria-label={`${label} Value`}
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={() => removeField(field.id)}
+              className="text-muted-foreground hover:text-destructive"
+              aria-label="Remove item"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
+        ))}
+      </div>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={addField}
+        className="text-muted-foreground"
+      >
+        <PlusCircle className="mr-2 h-4 w-4" />
+        Add {label.replace('(ppm)', '').trim()}
+      </Button>
+      {error && <p className="text-destructive text-sm">{error[0]}</p>}
+    </div>
+  );
+};
+
 
 export default function AnalysisForm({ formAction, errors }: AnalysisFormProps) {
   return (
@@ -80,18 +157,11 @@ export default function AnalysisForm({ formAction, errors }: AnalysisFormProps) 
               {errors?.organicMatterContent && <p className="text-destructive text-sm">{errors.organicMatterContent[0]}</p>}
             </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="traceMineralLevels">Trace Minerals (JSON)</Label>
-            <Textarea id="traceMineralLevels" name="traceMineralLevels" placeholder='e.g., {"iron": 5, "zinc": 2}' rows={3} defaultValue='{"iron": 4.5, "manganese": 2.0, "copper": 0.8, "zinc": 1.2}'/>
-            <p className="text-xs text-muted-foreground">Optional. Enter as a valid JSON object with number values.</p>
-            {errors?.traceMineralLevels && <p className="text-destructive text-sm">{errors.traceMineralLevels[0]}</p>}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="contaminantLevels">Contaminants (JSON)</Label>
-            <Textarea id="contaminantLevels" name="contaminantLevels" placeholder='e.g., {"lead": 0.1, "arsenic": 0.05}' rows={3} defaultValue='{"lead": 0.02, "cadmium": 0.01}'/>
-            <p className="text-xs text-muted-foreground">Optional. Enter as a valid JSON object with number values.</p>
-            {errors?.contaminantLevels && <p className="text-destructive text-sm">{errors.contaminantLevels[0]}</p>}
-          </div>
+          
+          <DynamicFieldArray name="traceMineralLevels" label="Trace Minerals (ppm)" error={errors?.traceMineralLevels} />
+          
+          <DynamicFieldArray name="contaminantLevels" label="Contaminants (ppm)" error={errors?.contaminantLevels} />
+
           <div className="space-y-2">
             <Label htmlFor="regionalClimateData">Regional Climate Data</Label>
             <Textarea id="regionalClimateData" name="regionalClimateData" required placeholder="Describe the climate, e.g., 'Temperate with warm, dry summers and mild, wet winters. Average rainfall 800mm/year.'" rows={4} defaultValue="Temperate climate with an average annual rainfall of 750mm. Summers are warm and sunny, winters are mild and wet. Average temperature range is 5°C to 25°C."/>

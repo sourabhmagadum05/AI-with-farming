@@ -12,12 +12,10 @@ const FormSchema = z.object({
   pHLevel: z.coerce.number().min(0, 'Must be between 0 and 14').max(14, 'Must be between 0 and 14'),
   organicMatterContent: z.coerce.number().min(0, 'Must be a positive number').max(100),
   regionalClimateData: z.string().min(10, 'Please provide more detail about the climate.'),
-  traceMineralLevels: z.string().optional(),
-  contaminantLevels: z.string().optional(),
   considerTraceMinerals: z.preprocess((val) => val === 'on', z.boolean().optional()),
   considerContaminants: z.preprocess((val) => val === 'on', z.boolean().optional()),
   considerPH: z.preprocess((val) => val === 'on', z.boolean().optional()),
-});
+}).catchall(z.string()); // Allow extra fields for dynamic inputs
 
 export type FormState = {
   message: string;
@@ -27,23 +25,35 @@ export type FormState = {
   };
 };
 
-const safeJsonParse = (str: string | undefined): Record<string, number> | undefined => {
-  if (!str || str.trim() === '') return undefined;
-  try {
-    const parsed = JSON.parse(str);
-    if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
-      for (const key in parsed) {
-        if (typeof parsed[key] !== 'number') {
-          throw new Error('All values in JSON object must be numbers.');
-        }
-      }
-      return parsed;
+const parseDynamicFields = (formData: FormData, prefix: string): Record<string, number> | undefined => {
+  const fields: Record<string, number> = {};
+  let count = 0;
+  let hasFields = false;
+
+  for (const [key, value] of formData.entries()) {
+    if (key.startsWith(`${prefix}_name_`)) {
+      count++;
     }
-    return undefined;
-  } catch (e) {
-    return undefined;
   }
-};
+
+  for (let i = 0; i < count; i++) {
+    const nameKey = `${prefix}_name_${i}`;
+    const valueKey = `${prefix}_value_${i}`;
+    
+    const name = formData.get(nameKey) as string;
+    const value = formData.get(valueKey) as string;
+
+    if (name && value) {
+      const numValue = parseFloat(value);
+      if (!isNaN(numValue)) {
+        fields[name] = numValue;
+        hasFields = true;
+      }
+    }
+  }
+  return hasFields ? fields : undefined;
+}
+
 
 export async function getAnalysisAndRecommendation(
   prevState: FormState,
@@ -59,32 +69,20 @@ export async function getAnalysisAndRecommendation(
       errors: validatedFields.error.flatten().fieldErrors,
     };
   }
+  
+  const soilHealthData = validatedFields.data;
 
-  const {
-    traceMineralLevels: traceMineralLevelsStr,
-    contaminantLevels: contaminantLevelsStr,
-    ...soilHealthData
-  } = validatedFields.data;
-
-  const traceMineralLevels = safeJsonParse(traceMineralLevelsStr);
-  if (traceMineralLevelsStr && traceMineralLevelsStr.trim() !== '' && !traceMineralLevels) {
-    return {
-      message: 'Invalid JSON format for Trace Minerals.',
-      errors: { traceMineralLevels: ['Must be a valid JSON object with number values.'] },
-    };
-  }
-
-  const contaminantLevels = safeJsonParse(contaminantLevelsStr);
-  if (contaminantLevelsStr && contaminantLevelsStr.trim() !== '' && !contaminantLevels) {
-    return {
-      message: 'Invalid JSON format for Contaminants.',
-      errors: { contaminantLevels: ['Must be a valid JSON object with number values.'] },
-    };
-  }
+  const traceMineralLevels = parseDynamicFields(formData, 'traceMineralLevels');
+  const contaminantLevels = parseDynamicFields(formData, 'contaminantLevels');
 
   try {
     const soilReport = await generateSoilHealthReport({
-      ...soilHealthData,
+      nitrogenLevel: soilHealthData.nitrogenLevel,
+      phosphorusLevel: soilHealthData.phosphorusLevel,
+      potassiumLevel: soilHealthData.potassiumLevel,
+      pHLevel: soilHealthData.pHLevel,
+      organicMatterContent: soilHealthData.organicMatterContent,
+      regionalClimateData: soilHealthData.regionalClimateData,
       traceMineralLevels,
       contaminantLevels,
     });
