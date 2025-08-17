@@ -52,6 +52,9 @@ const CropRecommendationOutputSchema = z.object({
   rationale: z
     .string()
     .describe('The rationale behind the crop recommendations.'),
+  profitMarginAnalysis: z
+    .string()
+    .describe('An analysis of the potential profit margin for the recommended crops.'),
 });
 export type CropRecommendationOutput = z.infer<typeof CropRecommendationOutputSchema>;
 
@@ -106,7 +109,7 @@ const prompt = ai.definePrompt({
   input: {schema: CropRecommendationInputSchema},
   output: {schema: CropRecommendationOutputSchema},
   tools: [traceMineralTool, contaminantTool, phTool],
-  prompt: `You are an expert agricultural advisor. Your task is to provide crop recommendations based on the provided soil analysis report and regional climate data.
+  prompt: `You are an expert agricultural and financial advisor. Your task is to provide crop recommendations based on the provided soil analysis report and regional climate data.
 
 Soil Analysis Report: {{{soilAnalysisReport}}}
 Regional Climate Data: {{{regionalClimateData}}}
@@ -115,7 +118,7 @@ Regional Climate Data: {{{regionalClimateData}}}
 {% if considerContaminants %}Consider contaminants when making your recommendations.{% endif %}
 {% if considerPH %}Consider the PH level when making your recommendations.{% endif %}
 
-Based on this information, recommend suitable crops and explain your reasoning.`, // Changed to Handlebars
+Based on this information, recommend suitable crops, explain your reasoning, and provide a detailed analysis of the potential profit margins for each recommended crop, considering market trends and input costs.`,
 });
 
 const cropRecommendationFlow = ai.defineFlow(

@@ -4,7 +4,7 @@ import { type FullReport } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Download, FlaskConical, Lightbulb, Sprout } from 'lucide-react';
+import { Download, FlaskConical, Lightbulb, Sprout, DollarSign } from 'lucide-react';
 import HealthScoreGauge from './health-score-gauge';
 
 type ReportDisplayProps = {
@@ -83,6 +83,18 @@ export default function ReportDisplay({ report }: ReportDisplayProps) {
             <Separator className="my-4" />
             <h3 className="font-semibold text-lg mb-2">Rationale:</h3>
             <p className="whitespace-pre-wrap text-sm leading-relaxed">{report.rationale}</p>
+          </CardContent>
+        </Card>
+
+        <Card className="card-shadow">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <DollarSign className="h-6 w-6 text-primary" />
+              Profit Margin Analysis
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="whitespace-pre-wrap text-sm leading-relaxed">{report.profitMarginAnalysis}</p>
           </CardContent>
         </Card>
       </div>
