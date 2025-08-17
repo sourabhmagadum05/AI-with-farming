@@ -1,9 +1,12 @@
+
 import AgriwiseDashboard from '@/components/agriwise-dashboard';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Leaf } from 'lucide-react';
 
 export default function Home() {
   return (
-    <div className="container mx-auto p-4 md:p-8">
+    <div className="container mx-auto p-4 md:p-8 relative">
+       <ThemeToggle />
       <header className="mb-8 text-center no-print">
         <div className="inline-flex items-center gap-2 mb-2">
           <Leaf className="h-10 w-10 text-primary" />
