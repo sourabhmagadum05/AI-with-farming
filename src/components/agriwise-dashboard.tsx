@@ -35,7 +35,7 @@ export default function AgriwiseDashboard() {
       <div className="lg:col-span-2 no-print">
         <AnalysisForm formAction={formAction} errors={state.errors} />
       </div>
-      <div className="lg:col-span-3">
+      <div className="lg:col-span-3" id="report-container">
         {state.report ? (
           <ReportDisplay report={state.report} />
         ) : (
