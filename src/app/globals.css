@@ -90,29 +90,28 @@ body {
 @layer utilities {
   @media print {
     body {
-      background: #fff;
+        background: #fff;
     }
-    .no-print {
-      display: none !important;
+    body * {
+      visibility: hidden;
+    }
+    #report-content, #report-content * {
+      visibility: visible;
     }
     #report-content {
-      display: block !important;
-      position: static;
+      position: absolute;
+      left: 0;
+      top: 0;
+      right: 0;
       margin: 0;
-      padding: 0;
-    }
-    body > div > *:not(#report-container) {
-       display: none;
-    }
-    #report-container > *:not(#report-content) {
-       display: none;
-    }
-     body > div {
-       padding: 0;
+      padding: 1.5rem;
     }
     .card-shadow {
        box-shadow: none !important;
        border: 1px solid hsl(var(--border)) !important;
+    }
+    .no-print {
+        display: none !important;
     }
   }
 }
