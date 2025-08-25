@@ -114,9 +114,9 @@ const prompt = ai.definePrompt({
 Soil Analysis Report: {{{soilAnalysisReport}}}
 Regional Climate Data: {{{regionalClimateData}}}
 
-{% if considerTraceMinerals %}Consider trace minerals when making your recommendations.{% endif %}
-{% if considerContaminants %}Consider contaminants when making your recommendations.{% endif %}
-{% if considerPH %}Consider the PH level when making your recommendations.{% endif %}
+{{#if considerTraceMinerals}}Consider trace minerals when making your recommendations.{{/if}}
+{{#if considerContaminants}}Consider contaminants when making your recommendations.{{/if}}
+{{#if considerPH}}Consider the PH level when making your recommendations.{{/if}}
 
 Based on this information, recommend suitable crops, explain your reasoning, and provide a detailed analysis of the potential profit margins for each recommended crop, considering market trends and input costs.`,
 });
